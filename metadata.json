@@ -1,9 +1,9 @@
 {
     "Identifier": "eos4qda",
     "Slug": "fasmifra",
-    "Status": "In progress",
-    "Title": "Fasmifra",
-    "Description": "FasmiFra generates only valid molecules at high frequency using (deep)SMILES fragments",
+    "Status": "Ready",
+    "Title": "Fasmifra molecule generator",
+    "Description": "FasmiFra is a molecular generator based on (deep)SMILES fragments. It is able to generate only valid molecules at high frequency.",
     "Mode": "Pretrained",
     "Task": ["Generative"],
     "Input": ["Compound"],

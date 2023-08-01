@@ -1,9 +1,9 @@
 {
-    "Identifier": "",
-    "Slug": "",
-    "Status": "",
-    "Title": "",
-    "Description": "",
+    "Identifier": "eos4qda",
+    "Slug": "fasmifra",
+    "Status": "In progress",
+    "Title": "fasmifra",
+    "Description": "Molecular generation by fast assembly of (deep)SMILES fragments",
     "Mode": "",
     "Task": [],
     "Input": [],
@@ -12,8 +12,10 @@
     "Output Type": [],
     "Output Shape": "",
     "Interpretation": "",
-    "Tag": [],
-    "Publication": "",
-    "Source Code": "",
-    "License": ""
+    "Tag": [
+        "Compound generation"
+    ],
+    "Publication": "https://jcheminf.biomedcentral.com/articles/10.1186/s13321-021-00566-4",
+    "Source Code": "https://github.com/UnixJunkie/FASMIFRA",
+    "License": "GPLv3"
 }

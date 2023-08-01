@@ -3,7 +3,7 @@
     "Slug": "fasmifra",
     "Status": "Ready",
     "Title": "Fasmifra molecule generator",
-    "Description": "FasmiFra is a molecular generator based on (deep)SMILES fragments. It is able to generate only valid molecules at high frequency.",
+    "Description": "FasmiFra is a molecular generator based on (deep)SMILES fragments. The authors use Deep SMILES to ensure the generated molecules are syntactically valid, and by working on string operations they are able to obtain high performance (>340,000 molecule/s)",
     "Mode": "Pretrained",
     "Task": ["Generative"],
     "Input": ["Compound"],

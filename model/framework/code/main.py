@@ -5,7 +5,7 @@ import sys
 
 root = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(root)
-from sampler import FasmifraSampler
+from biased_sampler import BiasedFasmifraSampler
 
 # parse arguments
 input_file = sys.argv[1]
@@ -15,9 +15,9 @@ output_file = sys.argv[2]
 root = os.path.dirname(os.path.abspath(__file__))
 
 # my model
-def sample(smi, num_samples=1000):
-    sampler  = FasmifraSampler()
-    return sampler.sample(smi, n=num_samples)
+def sample(smi):
+    sampler  = BiasedFasmifraSampler(input_smiles=smi)
+    return sampler.sample()
     
 # read SMILES from .csv file, assuming one column with header
 with open(input_file, "r") as f:

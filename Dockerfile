@@ -2,6 +2,7 @@ FROM bentoml/model-server:0.11.0-py38
 MAINTAINER ersilia
 
 RUN pip install rdkit==2023.3.2
+RUN pip install fpsim2
 RUN sudo apt update
 RUN sudo apt-get install bubblewrap -y
 RUN sudo apt-get install librdkit-dev python3-rdkit -y

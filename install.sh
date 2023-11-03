@@ -22,3 +22,4 @@ opam install -y fasmifra
 which fasmifra_fragment.py
 which fasmifra
 pip install fpsim2
+pip install tqdm

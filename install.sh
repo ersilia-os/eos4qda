@@ -8,11 +8,11 @@ try_sudo() {
     $cmd
   fi
 }
-try_sudo apt-get update
-try_sudo apt-get install software-properties-common
+try_sudo apt update
+try_sudo apt install software-properties-common
 try_sudo add-apt-repository ppa:avsm/ppa
-try_sudo apt-get update
-try_sudo apt-get install opam
+try_sudo apt update
+try_sudo apt install opam
 opam init -y
 eval $(opam env --switch=default)
 pip install rdkit

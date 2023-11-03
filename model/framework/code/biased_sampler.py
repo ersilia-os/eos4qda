@@ -17,7 +17,7 @@ warnings.filterwarnings("ignore")
 ROOT = os.path.dirname(os.path.abspath(__file__))
 # FRAGMENTS_FILE = os.path.join(ROOT, "..", "..", "checkpoints", "fragmented_fragments_from_enamine_merged.smi")
 FRAGMENTS_FILE = os.path.join(ROOT, "..", "..", "checkpoints", "chembl_frags.smi")
-FRAGMENT_SCRIPT = os.path.join(ROOT, "..", "FASMIFRA", "bin", "fasmifra_fragment.py")
+FRAGMENT_SCRIPT = os.path.join(ROOT, "fasmifra_fragment.py")
 
 MAX_ITER = 10
 INFLATION = 1.25

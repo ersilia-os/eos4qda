@@ -1,8 +1,8 @@
-apt update
-apt install software-properties-common
-add-apt-repository ppa:avsm/ppa
-apt update
-apt install opam
+sudo apt-get update
+sudo apt-get install software-properties-common
+sudo add-apt-repository ppa:avsm/ppa
+sudo apt-get update
+sudo apt-get install opam
 opam init -y
 eval $(opam env --switch=default)
 pip install rdkit

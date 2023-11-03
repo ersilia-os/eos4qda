@@ -10,6 +10,7 @@ try_sudo() {
   fi
 }
 try_sudo apt-get update
+try_sudo apt-get install -y autoconf
 try_sudo apt-get install -y apt-utils
 try_sudo apt-get install -y software-properties-common
 try_sudo add-apt-repository ppa:avsm/ppa

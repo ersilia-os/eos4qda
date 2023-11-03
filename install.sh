@@ -12,10 +12,11 @@ try_sudo() {
 try_sudo apt-get update
 try_sudo apt-get install -y apt-utils
 try_sudo apt-get install -y software-properties-common
+try_sudo wget https://raw.github.com/ocaml/opam/master/shell/opam_installer.sh
+try_sudo sh ./opam_installer.sh /usr/local/bin
 #try_sudo add-apt-repository ppa:avsm/ppa
 #try_sudo apt-get update
 #try_sudo apt-get install -y opam
-conda install -c conda-forge opam -y
 opam init -y
 eval $(opam env --switch=default)
 pip install rdkit

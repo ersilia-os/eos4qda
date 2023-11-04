@@ -26,6 +26,7 @@ FasmiFra is a molecular generator based on (deep)SMILES fragments. The authors u
 ## Ersilia model URLs
 * [GitHub](https://github.com/ersilia-os/eos4qda)
 * [AWS S3](https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos4qda.zip)
+* [DockerHub](https://hub.docker.com/r/ersiliaos/eos4qda) (AMD64, ARM64)
 
 ## Citation
 

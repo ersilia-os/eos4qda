@@ -34,9 +34,15 @@ for smi in smiles_list:
     outputs += [output]
 
 
+N_COLS = 100
+
 # write output in a .csv file
 with open(output_file, "w") as f:
     writer = csv.writer(f)
-    writer.writerow(["cpd_{}".format(i) for i in range(1, 101)])  # header
+    h = ["cpd_{}".format(i) for i in range(N_COLS)]
+    writer.writerow(h)
     for o in outputs:
+        o = o[:N_COLS]
+        if len(o) < N_COLS:
+            o = o + [None] * (N_COLS - len(o))
         writer.writerow(o)

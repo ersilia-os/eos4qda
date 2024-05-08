@@ -18,11 +18,11 @@ try_sudo apt-get update
 try_sudo apt-get install -y opam
 opam init --disable-sandboxing -y
 eval $(opam env --switch=default)
-pip install rdkit
+python -m pip install rdkit==2023.9.6
 eval `opam config env`
 opam install --fake conf-rdkit
 opam install -y fasmifra
 which fasmifra_fragment.py
 which fasmifra
-pip install fpsim2
-pip install tqdm
+python -m pip install FPSim2==0.5.1
+python -m pip install tqdm==4.66.4

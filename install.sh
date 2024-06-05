@@ -24,5 +24,5 @@ opam install --fake conf-rdkit
 opam install -y fasmifra
 which fasmifra_fragment.py
 which fasmifra
-python -m pip install FPSim2==0.5.1
+python -m pip install FPSim2==0.4.5
 python -m pip install tqdm==4.66.4

@@ -39,7 +39,7 @@ N_COLS = 100
 # write output in a .csv file
 with open(output_file, "w") as f:
     writer = csv.writer(f)
-    h = ["cpd_{}".format(i) for i in range(N_COLS)]
+    h = ["cpd_{:02d}".format(i) for i in range(N_COLS)]
     writer.writerow(h)
     for o in outputs:
         o = o[:N_COLS]

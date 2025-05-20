@@ -40,8 +40,15 @@
     "S3": "https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos4qda.zip",
     "DockerHub": "https://hub.docker.com/r/ersiliaos/eos4qda",
     "Docker Architecture": [
-        "AMD64"
+        "AMD64",
+        "ARM64"
     ],
     "Model Size": 25.0,
-    "Environment Size": 637.0
+    "Environment Size": 637.0,
+    "Image Size": "null",
+    "Computational Performance 1": "null",
+    "Computational Performance 2": "null",
+    "Computational Performance 3": "null",
+    "Computational Performance 4": "null",
+    "Computational Performance 5": "null"
 }

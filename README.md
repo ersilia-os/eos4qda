@@ -50,7 +50,12 @@ _10 of 100 columns are shown_
 ### Resource Consumption
 - **Model Size (Mb):** `25`
 - **Environment Size (Mb):** `637`
+- **Image Size (Mb):** `624.98`
 
+**Computational Performance (seconds):**
+- 10 inputs: `35.09`
+- 100 inputs: `223.59`
+- 10000 inputs: `403.25`
 
 ### References
 - **Source Code**: [https://github.com/UnixJunkie/FASMIFRA](https://github.com/UnixJunkie/FASMIFRA)

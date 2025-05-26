@@ -44,7 +44,7 @@ _10 of 100 columns are shown_
 - **Source:** `Local`
 - **Source Type:** `External`
 - **DockerHub**: [https://hub.docker.com/r/ersiliaos/eos4qda](https://hub.docker.com/r/ersiliaos/eos4qda)
-- **Docker Architecture:** `AMD64`
+- **Docker Architecture:** `AMD64`, `ARM64`
 - **S3 Storage**: [https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos4qda.zip](https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos4qda.zip)
 
 ### Resource Consumption

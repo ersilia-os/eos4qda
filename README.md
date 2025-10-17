@@ -4,6 +4,7 @@ FasmiFra is a molecular generator based on (deep)SMILES fragments. The authors u
 
 This model was incorporated on 2023-08-01.
 
+
 ## Information
 ### Identifiers
 - **Ersilia Identifier:** `eos4qda`
@@ -13,7 +14,7 @@ This model was incorporated on 2023-08-01.
 - **Task:** `Sampling`
 - **Subtask:** `Generation`
 - **Biomedical Area:** `Any`
-- **Target Organism:** `Not Applicable`
+- **Target Organism:** `Any`
 - **Tags:** `Compound generation`
 
 ### Input

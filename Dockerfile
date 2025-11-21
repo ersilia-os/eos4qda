@@ -1,9 +1,18 @@
 FROM bentoml/model-server:0.11.0-py38
-MAINTAINER ersilia
+LABEL maintainer="ersilia"
 
-RUN curl -sL https://raw.githubusercontent.com/ersilia-os/eos4qda/main/install.sh | sh
-RUN pip install tqdm==4.67.1
-RUN pip install FPSim2==0.4.5
+ENV DEBIAN_FRONTEND=noninteractive
+ENV OPAMYES=1
+
+# Use bash so `eval "$(opam env)"` works reliably
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Copy the installer first (so it can leverage Docker layer caching)
+COPY opam_install.sh /usr/local/bin/opam_install.sh
+RUN chmod +x /usr/local/bin/opam_install.sh && /usr/local/bin/opam_install.sh
+
+# Python deps in one layer
+RUN pip install --no-cache-dir tqdm==4.67.1 FPSim2==0.4.5
 
 WORKDIR /repo
 COPY . /repo

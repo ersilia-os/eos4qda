@@ -110,6 +110,7 @@ class BiasedFasmifraSampler(object):
             self.n_samples_per_round,
             self.random_seed,
         )
+        print(cmd)
         with open(self.log_file, "a") as fp:
             subprocess.Popen(
                 cmd, stdout=fp, stderr=fp, shell=True, env=os.environ

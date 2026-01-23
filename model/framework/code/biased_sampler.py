@@ -103,24 +103,45 @@ class BiasedFasmifraSampler(object):
                 f.write("{0}\tfrag_{1}\n".format(frag, i))
 
     def _sample_single(self):
+        import shutil
+
         self.random_seed += 1
-        cmd = "opam init -a; eval $(opam env); fasmifra -i {0} -o {1} -n {2} --seed {3}".format(
-            self.cur_frags_file,
-            self.output_file,
-            self.n_samples_per_round,
-            self.random_seed,
-        )
-        print(cmd)
+
+        fasmifra_bin = shutil.which("fasmifra")
+        if not fasmifra_bin:
+            raise RuntimeError(
+                "fasmifra not found on PATH for this Python process. "
+                f"PATH={os.environ.get('PATH', '')}"
+            )
+
+        cmd = [
+            fasmifra_bin,
+            "-i", self.cur_frags_file,
+            "-o", self.output_file,
+            "-n", str(self.n_samples_per_round),
+            "--seed", str(self.random_seed),
+        ]
+
         with open(self.log_file, "a") as fp:
-            subprocess.Popen(
-                cmd, stdout=fp, stderr=fp, shell=True, env=os.environ
-            ).wait()
+            fp.write(f"\nCMD: {' '.join(cmd)}\n")
+            fp.flush()
+            p = subprocess.run(cmd, stdout=fp, stderr=fp, env=os.environ)
+
+        if p.returncode != 0 or not os.path.exists(self.output_file):
+            raise RuntimeError(
+                f"fasmifra failed (exit={p.returncode}); output_missing={not os.path.exists(self.output_file)}; "
+                f"see log: {self.log_file}"
+            )
+
         sampled_smiles = []
         with open(self.output_file, "r") as f:
             reader = csv.reader(f, delimiter="\t")
             for r in reader:
-                sampled_smiles += [r[0]]
+                if r:
+                    sampled_smiles.append(r[0])
+
         return list(set(sampled_smiles))
+
 
     def _build_search_database(self, smiles_list):
         if os.path.exists(self.db_file):
@@ -175,7 +196,6 @@ class BiasedFasmifraSampler(object):
                     if x in smi:
                         sampled_smiles_ += [smi]
             sampled_smiles = sampled_smiles_
-            print(len(sampled_smiles))
             sampled_smiles_ = []
             for smi in sampled_smiles:
                 mol = Chem.MolFromSmiles(smi)
@@ -184,15 +204,10 @@ class BiasedFasmifraSampler(object):
                 sampled_smiles_ += [Chem.MolToSmiles(mol)]
             sampled_smiles = sampled_smiles_
             sampled_smiles = list(set(sampled_smiles))
-            print(len(sampled_smiles))
-            # print(len(sampled_smiles))
-            # self._build_search_database(sampled_smiles)
-            # hits = self._search_database()
             hits = sampled_smiles
             all_hits.update(hits)
             if len(all_hits) > self.n_selected_samples * INFLATION:
                 break
         all_hits = list(all_hits)
-        print(len(all_hits))
         all_hits = self._select_n_best(all_hits)
         return all_hits

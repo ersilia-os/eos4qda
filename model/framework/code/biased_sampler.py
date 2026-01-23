@@ -2,6 +2,7 @@ import tempfile
 import os
 import csv
 import re
+import shutil
 import subprocess
 import warnings
 from tqdm import tqdm
@@ -103,23 +104,62 @@ class BiasedFasmifraSampler(object):
                 f.write("{0}\tfrag_{1}\n".format(frag, i))
 
     def _sample_single(self):
-        import shutil
-
         self.random_seed += 1
 
-        fasmifra_bin = shutil.which("fasmifra")
+        def _find_fasmifra():
+            p = shutil.which("fasmifra")
+            if p:
+                return p
+
+            try:
+                opam = shutil.which("opam")
+                if opam:
+                    prefix = subprocess.check_output(
+                        [opam, "var", "prefix"],
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        env=os.environ,
+                    ).strip()
+                    cand = os.path.join(prefix, "bin", "fasmifra")
+                    if os.path.exists(cand) and os.access(cand, os.X_OK):
+                        os.environ["PATH"] = (
+                            os.path.join(prefix, "bin")
+                            + os.pathsep
+                            + os.environ.get("PATH", "")
+                        )
+                        return cand
+            except Exception:
+                pass
+
+            for cand in [
+                "/usr/local/bin/fasmifra",
+                "/usr/bin/fasmifra",
+                "/bin/fasmifra",
+                "/root/.opam/default/bin/fasmifra",
+            ]:
+                if os.path.exists(cand) and os.access(cand, os.X_OK):
+                    return cand
+
+            return None
+
+        fasmifra_bin = _find_fasmifra()
         if not fasmifra_bin:
             raise RuntimeError(
-                "fasmifra not found on PATH for this Python process. "
-                f"PATH={os.environ.get('PATH', '')}"
+                "fasmifra not found from Python. "
+                f"PATH={os.environ.get('PATH', '')}. "
+                "Tried PATH, `opam var prefix`, and common locations."
             )
 
         cmd = [
             fasmifra_bin,
-            "-i", self.cur_frags_file,
-            "-o", self.output_file,
-            "-n", str(self.n_samples_per_round),
-            "--seed", str(self.random_seed),
+            "-i",
+            self.cur_frags_file,
+            "-o",
+            self.output_file,
+            "-n",
+            str(self.n_samples_per_round),
+            "--seed",
+            str(self.random_seed),
         ]
 
         with open(self.log_file, "a") as fp:
@@ -141,7 +181,6 @@ class BiasedFasmifraSampler(object):
                     sampled_smiles.append(r[0])
 
         return list(set(sampled_smiles))
-
 
     def _build_search_database(self, smiles_list):
         if os.path.exists(self.db_file):

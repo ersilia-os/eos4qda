@@ -104,12 +104,6 @@ ensure_opam_switch() {
   eval "$(opam env --switch=default)"
 }
 
-ensure_python_rdkit() {
-  log "Installing Python RDKit"
-  python3 -m pip install --upgrade pip
-  python3 -m pip install rdkit==2023.9.6
-}
-
 ensure_fasmifra() {
   if have fasmifra; then
     log "fasmifra already on PATH: $(command -v fasmifra)"
@@ -146,7 +140,6 @@ main() {
   ensure_opam
   ensure_opam_initialized
   ensure_opam_switch
-  ensure_python_rdkit
 
   opam install --fake -y conf-rdkit >/dev/null 2>&1 || true
 

@@ -60,7 +60,7 @@ _10 of 100 columns are shown_
 
 ### References
 - **Source Code**: [https://github.com/UnixJunkie/FASMIFRA](https://github.com/UnixJunkie/FASMIFRA)
-- **Publication**: [https://jcheminf.biomedcentral.com/articles/10.1186/s13321-021-00566-4](https://jcheminf.biomedcentral.com/articles/10.1186/s13321-021-00566-4)
+- **Publication**: [https://doi.org/10.1186/s13321-021-00566-4](https://doi.org/10.1186/s13321-021-00566-4)
 - **Publication Type:** `Peer reviewed`
 - **Publication Year:** `2021`
 - **Ersilia Contributor:** [miquelduranfrigola](https://github.com/miquelduranfrigola)

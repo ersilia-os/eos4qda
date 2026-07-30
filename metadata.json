@@ -18,9 +18,9 @@
     "Output": [
         "Compound"
     ],
-    "Output Dimension": 1000,
+    "Output Dimension": 100,
     "Output Consistency": "Variable",
-    "Interpretation": "1000 generated molecules per each input",
+    "Interpretation": "100 generated molecules per each input",
     "Tag": [
         "Compound generation"
     ],

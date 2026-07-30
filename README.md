@@ -22,9 +22,9 @@ This model was incorporated on 2023-08-01.
 - **Input Dimension:** `1`
 
 ### Output
-- **Output Dimension:** `1000`
+- **Output Dimension:** `100`
 - **Output Consistency:** `Variable`
-- **Interpretation:** 1000 generated molecules per each input
+- **Interpretation:** 100 generated molecules per each input
 
 Below are the **Output Columns** of the model:
 | Name | Type | Direction | Description |

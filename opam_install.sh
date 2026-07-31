@@ -123,6 +123,25 @@ ensure_fasmifra() {
   exit 1
 }
 
+persist_fasmifra_into_python_prefix() {
+  # opam installs fasmifra into its own switch directory (e.g. ~/.opam/default/bin),
+  # which lives outside the conda environment. Ersilia's packaging only preserves
+  # the conda environment's own directory tree, so opam's switch is discarded and
+  # fasmifra ends up missing (not just off PATH) in the final packaged image.
+  # Copying the binary into the active Python's prefix bakes it into that tree.
+  local src prefix_bin
+  src="$(command -v fasmifra)"
+  prefix_bin="$(python3 -c 'import sys; print(sys.prefix)')/bin"
+  if [ "$(dirname "$src")" = "$prefix_bin" ]; then
+    log "fasmifra already inside the Python prefix bin dir: $src"
+    return 0
+  fi
+  log "Copying fasmifra into Python prefix bin dir: $prefix_bin"
+  mkdir -p "$prefix_bin"
+  cp -L "$src" "$prefix_bin/fasmifra"
+  chmod +x "$prefix_bin/fasmifra"
+}
+
 sanity() {
   log "Sanity checks"
   log "opam: $(opam --version)"
@@ -144,6 +163,7 @@ main() {
   opam install --fake -y conf-rdkit >/dev/null 2>&1 || true
 
   ensure_fasmifra
+  persist_fasmifra_into_python_prefix
 
   log "fasmifra_fragment.py check (optional)"
   command -v fasmifra_fragment.py >/dev/null 2>&1 && log "found: $(command -v fasmifra_fragment.py)" || log "not on PATH (ok if referenced by full path)"

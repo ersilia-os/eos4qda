@@ -128,18 +128,33 @@ persist_fasmifra_into_python_prefix() {
   # which lives outside the conda environment. Ersilia's packaging only preserves
   # the conda environment's own directory tree, so opam's switch is discarded and
   # fasmifra ends up missing (not just off PATH) in the final packaged image.
-  # Copying the binary into the active Python's prefix bakes it into that tree.
+  # Copying the binary into that conda environment's own bin dir bakes it into
+  # the tree that actually survives.
+  #
+  # This script's own PATH override above (and apt-installing its own python3)
+  # means a bare `python3` here is not reliable for finding the *target* conda
+  # env -- use $CONDA_PREFIX directly, which ersilia sets before running this
+  # script (it activates the environment first). Only fall back to python3's
+  # own prefix for manual/local runs where CONDA_PREFIX isn't set.
   local src prefix_bin
   src="$(command -v fasmifra)"
-  prefix_bin="$(python3 -c 'import sys; print(sys.prefix)')/bin"
+  if [ -n "${CONDA_PREFIX:-}" ]; then
+    prefix_bin="$CONDA_PREFIX/bin"
+  else
+    log "WARN: CONDA_PREFIX not set, falling back to python3's own prefix"
+    prefix_bin="$(python3 -c 'import sys; print(sys.prefix)')/bin"
+  fi
+  log "fasmifra source: $src"
+  log "Target prefix bin dir (CONDA_PREFIX=${CONDA_PREFIX:-unset}): $prefix_bin"
   if [ "$(dirname "$src")" = "$prefix_bin" ]; then
-    log "fasmifra already inside the Python prefix bin dir: $src"
+    log "fasmifra already inside the target bin dir: $src"
     return 0
   fi
-  log "Copying fasmifra into Python prefix bin dir: $prefix_bin"
+  log "Copying fasmifra into: $prefix_bin"
   mkdir -p "$prefix_bin"
   cp -L "$src" "$prefix_bin/fasmifra"
   chmod +x "$prefix_bin/fasmifra"
+  log "Verifying copy: $("$prefix_bin/fasmifra" --version 2>&1 || echo 'could not run copied binary')"
 }
 
 sanity() {

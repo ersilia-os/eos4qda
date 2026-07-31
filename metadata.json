@@ -1,7 +1,7 @@
 {
     "Identifier": "eos4qda",
     "Slug": "fasmifra",
-    "Status": "In maintenance",
+    "Status": "Ready",
     "Title": "FasmiFra molecule generator",
     "Description": "FasmiFra is a molecular generator based on (deep)SMILES fragments. The authors use Deep SMILES to ensure the generated molecules are syntactically valid, and by working on string operations they are able to obtain high performance (>340,000 molecule/s). Here, we use 100k compounds from ChEMBL to sample fragments. Only assembled molecules containing one of the fragments of the input molecule are retained.",
     "Deployment": [
@@ -47,10 +47,10 @@
     ],
     "Model Size": 25.0,
     "Environment Size": 647.0,
-    "Image Size": 624.98,
-    "Computational Performance 1": 35.09,
-    "Computational Performance 2": 61.46,
-    "Computational Performance 3": 223.59,
-    "Computational Performance 4": 254.9,
-    "Computational Performance 5": 403.25
+    "Image Size": 772.68,
+    "Computational Performance 1": 95.43,
+    "Computational Performance 2": 660.71,
+    "Computational Performance 3": -1.0,
+    "Computational Performance 4": -1.0,
+    "Computational Performance 5": -1.0
 }

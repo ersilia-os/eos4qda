@@ -28,16 +28,16 @@ This model was incorporated on 2023-08-01.Last packaged on 2026-07-31.
 Below are the **Output Columns** of the model:
 | Name | Type | Direction | Description |
 |------|------|-----------|-------------|
-| cpd_00 | string |  | Generated molecule index 0 using FASMIFRA |
-| cpd_01 | string |  | Generated molecule index 1 using FASMIFRA |
-| cpd_02 | string |  | Generated molecule index 2 using FASMIFRA |
-| cpd_03 | string |  | Generated molecule index 3 using FASMIFRA |
-| cpd_04 | string |  | Generated molecule index 4 using FASMIFRA |
-| cpd_05 | string |  | Generated molecule index 5 using FASMIFRA |
-| cpd_06 | string |  | Generated molecule index 6 using FASMIFRA |
-| cpd_07 | string |  | Generated molecule index 7 using FASMIFRA |
-| cpd_08 | string |  | Generated molecule index 8 using FASMIFRA |
-| cpd_09 | string |  | Generated molecule index 9 using FASMIFRA |
+| smi_00 | string |  | Generated molecule index 0 using FASMIFRA |
+| smi_01 | string |  | Generated molecule index 1 using FASMIFRA |
+| smi_02 | string |  | Generated molecule index 2 using FASMIFRA |
+| smi_03 | string |  | Generated molecule index 3 using FASMIFRA |
+| smi_04 | string |  | Generated molecule index 4 using FASMIFRA |
+| smi_05 | string |  | Generated molecule index 5 using FASMIFRA |
+| smi_06 | string |  | Generated molecule index 6 using FASMIFRA |
+| smi_07 | string |  | Generated molecule index 7 using FASMIFRA |
+| smi_08 | string |  | Generated molecule index 8 using FASMIFRA |
+| smi_09 | string |  | Generated molecule index 9 using FASMIFRA |
 
 _10 of 100 columns are shown_
 ### Source and Deployment

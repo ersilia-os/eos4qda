@@ -5,10 +5,7 @@ import re
 import shutil
 import subprocess
 import warnings
-from tqdm import tqdm
 import random
-from FPSim2.io import create_db_file
-from FPSim2 import FPSim2Engine
 from rdkit import Chem
 from rdkit import DataStructs
 from rdkit.Chem import AllChem
@@ -37,7 +34,6 @@ def sort_molecules_by_similarity(ref_mol, mol_list, top_n):
     similarities = calculate_similarity(ref_mol, mol_list)
     paired = list(zip(mol_list, similarities))
     sorted_mols = sorted(paired, key=lambda x: x[1], reverse=True)
-    print("Sorted mols", len(sorted_mols))
     return [mol for mol, sim in sorted_mols][:top_n]
 
 
@@ -51,7 +47,6 @@ class BiasedFasmifraSampler(object):
         self.frags_file = os.path.abspath(FRAGMENTS_FILE)
         self.tmp_folder = tempfile.mkdtemp()
         self.log_file = os.path.join(self.tmp_folder, "log.txt")
-        self.db_file = os.path.join(self.tmp_folder, "db_file.h5")
         self.output_file = os.path.join(os.path.join(self.tmp_folder, "output.smi"))
         self.random_seed = random.randint(1, 99999)
         self.input_fragments = os.path.join(self.tmp_folder, "input_frags.smi")
@@ -181,25 +176,6 @@ class BiasedFasmifraSampler(object):
                     sampled_smiles.append(r[0])
 
         return list(set(sampled_smiles))
-
-    def _build_search_database(self, smiles_list):
-        if os.path.exists(self.db_file):
-            os.remove(self.db_file)
-        smiles_list_ = []
-        for smi in tqdm(smiles_list):
-            mol = Chem.MolFromSmiles(smi)
-            if mol is not None:
-                smiles_list_ += [smi]
-        self.cur_input_list = [[smi, i] for i, smi in enumerate(smiles_list_)]
-        create_db_file(
-            self.cur_input_list, self.db_file, "Morgan", {"radius": 2, "nBits": 2048}
-        )
-
-    def _search_database(self):
-        fpe = FPSim2Engine(self.db_file)
-        results = fpe.similarity(self.input_smiles, 0.7, n_workers=1)
-        hits = [self.cur_input_list[r[0]][0] for r in results]
-        return hits
 
     def _select_n_best(self, smiles_list):
         if len(smiles_list) == 0:

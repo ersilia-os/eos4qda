@@ -30,7 +30,12 @@ with open(input_file, "r") as f:
 # run model
 outputs = []
 for smi in smiles_list:
-    output = sample(smi)
+    try:
+        output = sample(smi)
+    except Exception as e:
+        # one failing compound must not lose the whole run: keep its (empty) row so rows stay aligned
+        print("[eos4qda] no output for %r: %s" % (smi, e), file=sys.stderr)
+        output = []
     outputs += [output]
 
 

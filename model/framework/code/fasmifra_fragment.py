@@ -7,10 +7,12 @@
 # Ultra-fast generator of only valid molecules using (Deep)SMILES fragments
 
 import argparse
+import json
 import random
 import rdkit
 import sys
 import time
+import zlib
 
 from rdkit import Chem
 from rdkit.Chem import Descriptors
@@ -117,12 +119,26 @@ def set_name(mol, name):
     mol.SetProp("name", name)
 
 
+# Set when the atom-type dictionary is preloaded from the fragment library (--types). The tag index of
+# an atom type is only meaningful if it is the one the library uses, so a preloaded dictionary must be
+# used as is, and any new type needs an index that is the same in every process that fragments an input.
+STABLE_NEW_INDEXES = False
+FIRST_NEW_INDEX = 1000
+
+
 def index_for_atom_type(atom_types_dict, atom_type):
     try:
         return atom_types_dict[atom_type]
     except KeyError:
-        # indexes need to start at 1
-        v = len(atom_types_dict) + 1
+        if STABLE_NEW_INDEXES:
+            # a type the library has never seen: derive its index from the type itself, so that separate
+            # fragmenter runs (e.g. 100 Da and 150 Da) agree on it
+            v = FIRST_NEW_INDEX + zlib.crc32(atom_type.encode()) % 1000
+            while v in atom_types_dict.values():
+                v += 1
+        else:
+            # indexes need to start at 1
+            v = len(atom_types_dict) + 1
         atom_types_dict[atom_type] = v
         return v
 
@@ -208,6 +224,12 @@ if __name__ == "__main__":
     )
     parser.add_argument("--seed", dest="seed", default=-1, type=int, help="RNG seed")
     parser.add_argument(
+        "--types",
+        dest="types_fn",
+        default=None,
+        help="JSON file {atom type: tag index} of the fragment library the output will be mixed with",
+    )
+    parser.add_argument(
         "-n",
         dest="nb_passes",
         default=1,
@@ -241,6 +263,10 @@ if __name__ == "__main__":
     # fragmenting ---------------------------------------------------------
     mol_supplier = RobustSmilesMolSupplier(input_fn)
     seen_types_dict = {}
+    if args.types_fn is not None:
+        with open(args.types_fn) as f:
+            seen_types_dict = {str(k): int(v) for k, v in json.load(f).items()}
+        STABLE_NEW_INDEXES = True
     for name, mol in mol_supplier:
         for i in range(nb_passes):
             tagged_bonds_smi, parent_name = tag_cut_bonds(

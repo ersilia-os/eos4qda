@@ -2,7 +2,7 @@
 
 FasmiFra is a molecular generator based on (deep)SMILES fragments. Deep SMILES ensures generated molecules are syntactically valid while allowing fast string-based assembly (>340,000 molecules/s). A 100k-compound ChEMBL fragment library is used. The input molecule is cut into fragments and added to the library with a high weight, so assembled molecules are enriched in pieces of the input. Returned molecules are the ones most similar to the input that contain a fragment of it; the input itself is never returned.
 
-This model was incorporated on 2023-08-01.Last packaged on 2026-09-01.
+This model was incorporated on 2023-08-01.Last packaged on 2026-09-28.
 
 ## Information
 ### Identifiers
@@ -50,10 +50,10 @@ _10 of 100 columns are shown_
 ### Resource Consumption
 - **Model Size (Mb):** `26`
 - **Environment Size (Mb):** `450`
-- **Image Size (Mb):** `772.9`
+- **Image Size (Mb):** `587.52`
 
 **Computational Performance (seconds):**
-- 10 inputs: `83.76`
+- 10 inputs: `118.87`
 - 100 inputs: `-1`
 - 10000 inputs: `-1`
 

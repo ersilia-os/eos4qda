@@ -9,7 +9,7 @@ import warnings
 import random
 from rdkit import Chem
 from rdkit import DataStructs
-from rdkit.Chem import AllChem
+from rdkit.Chem import AllChem, Descriptors
 
 warnings.filterwarnings("ignore")
 
@@ -25,14 +25,15 @@ TYPES_FILE = os.path.join(ROOT, "..", "..", "checkpoints", "atom_types.json")
 # fragments file: the pool is the ChEMBL library plus the input's own fragment lines, repeated INPUT_WEIGHT times.
 INPUT_WEIGHT = 1000
 LIBRARY_LINES = 100000
-N_SAMPLES_PER_ROUND = 300000
-# Only the TOP_CANDIDATES most similar molecules are ever canonicalized / substructure-checked.
-TOP_CANDIDATES = 2000
+# Candidates assembled per round. The 100 outputs are picked at random among the candidates that qualify (similarity
+# plays no part in the pick), and only a few percent qualify at worst, so this is ample; more rounds are the fallback.
+N_SAMPLES_PER_ROUND = 30000
+# An output may weigh at most this many times the input.
+MAX_MW_RATIO = 1.5
 # A piece of the input must have at least this many heavy atoms to count as "containing a fragment of the input"
-# (smaller pieces such as a phenyl are in almost every molecule).
+# (smaller pieces such as a phenyl are in almost every molecule), and so must the other side of its cut.
 MIN_PIECE_ATOMS = 6
 MAX_ITER = 5
-_SIM_CHUNK = 20000
 
 
 _CHECKED_FASMIFRA = set()
@@ -211,9 +212,10 @@ class BiasedFasmifraSampler(object):
         either in a ring or next to a stereocentre, both protected by fasmifra_fragment.py) produces only
         "pieces" that are in fact almost the whole molecule. Requiring an assembled candidate to contain such
         a piece amounts to requiring it to reproduce the input almost exactly -- which then either matches
-        nothing, or matches only the input itself and is dropped by the echo exclusion in
-        `_rank_by_similarity`. Confirmed empirically on two such inputs: dropping the size cap left every one
-        of MAX_ITER rounds returning 0 selected molecules, despite hundreds of thousands of raw candidates."""
+        nothing, or matches only the input itself and is dropped as an echo in `_pick`. Confirmed empirically
+        on two such inputs: dropping the size cap left every one of MAX_ITER rounds returning 0 selected
+        molecules, despite hundreds of thousands of raw candidates. An input with no piece at all (see
+        `sample`) has nothing to build on and gets no output."""
         max_atoms = input_heavy_atoms - MIN_PIECE_ATOMS
         queries = []
         for line in fragment_lines:
@@ -234,70 +236,79 @@ class BiasedFasmifraSampler(object):
                         queries.append(q)
         return queries
 
-    def _rank_by_similarity(self, smiles, ref_fp, input_flat, ranked):
-        """Merge `smiles` into `ranked`, a list of (similarity, raw_smiles) kept to the TOP_CANDIDATES best.
-        Similarity is the Morgan (radius 2, count) Tanimoto to the input.
+    def _pick(self, candidates, input_flat, input_mw, pieces, selected, seen):
+        """Walk `candidates`, which are already in random order, and append the canonical SMILES of each one
+        that qualifies to `selected`, until it holds n_selected_samples. A candidate qualifies if it is a
+        valid molecule not picked before, is not the input itself (ignoring stereochemistry: for a rigid
+        input with few cut bonds, fasmifra mostly reconstructs the input in many equivalent stereo
+        re-orderings), weighs at most MAX_MW_RATIO times the input, and contains a piece of the input.
 
-        The input molecule itself must be excluded HERE, not only when `ranked` is finally read out: for a
-        rigid input with few cut bonds (e.g. fused rings), fasmifra mostly reconstructs the input itself, in
-        many equivalent stereo re-orderings, all scoring the maximum similarity of 1.0 (Morgan fingerprints
-        ignore stereochemistry by default). Confirmed empirically: for such an input, all TOP_CANDIDATES slots
-        filled up with these echoes and nothing else ever got selected, across every one of MAX_ITER rounds.
-        Excluding echoes before they can occupy a slot leaves room for real, different-but-similar molecules.
-
-        The echo check (isomericSmiles=False) already canonicalizes every candidate once; a second, fully
-        canonical form is only computed later, for the far smaller `ranked` set (see `_select_n_best`).
+        Similarity to the input is never looked at here: it only enters afterwards, to order the molecules
+        once all of them have been picked (see `sample`). Parsing stops as soon as enough have qualified.
         """
-        for start in range(0, len(smiles), _SIM_CHUNK):
-            fps, ok = [], []
-            for smi in smiles[start:start + _SIM_CHUNK]:
-                mol = Chem.MolFromSmiles(smi)
-                if mol is None:
-                    continue
-                if Chem.MolToSmiles(mol, isomericSmiles=False) == input_flat:
-                    continue
-                fps.append(AllChem.GetMorganFingerprint(mol, 2))
-                ok.append(smi)
-            ranked = ranked + list(zip(DataStructs.BulkTanimotoSimilarity(ref_fp, fps), ok))
-            ranked.sort(key=lambda x: -x[0])
-            del ranked[TOP_CANDIDATES:]
-        return ranked
-
-    def _select_n_best(self, ranked, pieces):
-        """The most similar molecules that are unique and contain a piece of the input. `ranked` already
-        excludes the input itself (see `_rank_by_similarity`)."""
-        selected, seen = [], set()
-        for _, smi in ranked:
+        for smi in candidates:
+            if len(selected) >= self.n_selected_samples:
+                return
             mol = Chem.MolFromSmiles(smi)
-            can = Chem.MolToSmiles(mol)
-            if can in seen:
+            if mol is None:
                 continue
-            if pieces and not any(mol.HasSubstructMatch(q) for q in pieces):
+            key = Chem.MolToSmiles(mol)
+            if key in seen:
                 continue
-            seen.add(can)
-            selected.append(can)
-            if len(selected) == self.n_selected_samples:
-                break
-        return selected
+            if Chem.MolToSmiles(mol, isomericSmiles=False) == input_flat:
+                continue
+            if Descriptors.MolWt(mol) > MAX_MW_RATIO * input_mw:
+                continue
+            if not any(mol.HasSubstructMatch(q) for q in pieces):
+                continue
+            seen.add(key)
+            selected.append(key)
 
     def sample(self):
+        """100 molecules assembled by fasmifra from a pool rich in the input's own fragments, picked at
+        random among those that qualify (see `_pick`) and only then, once all of them have been picked,
+        ordered from most to least similar (Morgan Tanimoto) to the input."""
         try:
             input_mol = Chem.MolFromSmiles(self.input_smiles)
             if input_mol is None:
                 raise ValueError("invalid input SMILES: %r" % self.input_smiles)
             input_flat = Chem.MolToSmiles(input_mol, isomericSmiles=False)
-            ref_fp = AllChem.GetMorganFingerprint(input_mol, 2)
+            input_mw = Descriptors.MolWt(input_mol)
             input_fragments = self._fragment_input()
             pieces = self._input_pieces(input_fragments, input_mol.GetNumHeavyAtoms())
-            ranked, done, selected = [], set(), []
+            if not pieces:
+                # no fragment of the input to build on: the model has nothing to anchor its outputs to
+                raise ValueError(
+                    "the input has no piece to build on (a piece needs at least %d heavy atoms and at least %d "
+                    "more on the other side of its cut; the input has %d)"
+                    % (MIN_PIECE_ATOMS, MIN_PIECE_ATOMS, input_mol.GetNumHeavyAtoms())
+                )
+            selected, seen = [], set()
             for _ in range(MAX_ITER):
                 self._build_focused_fragments_file(input_fragments)
-                complete = [s for s in self._sample_single() if "*" not in s and s not in done]
-                done.update(complete)
-                ranked = self._rank_by_similarity(complete, ref_fp, input_flat, ranked)
-                selected = self._select_n_best(ranked, pieces)
+                candidates = [s for s in self._sample_single() if "*" not in s]
+                random.shuffle(candidates)
+                self._pick(candidates, input_flat, input_mw, pieces, selected, seen)
                 if len(selected) >= self.n_selected_samples:
                     break
-            return selected
+            if not selected:
+                raise ValueError(
+                    "%d rounds of %d candidates gave no molecule that contains a piece of the input within "
+                    "%.1f times its weight" % (MAX_ITER, self.n_samples_per_round, MAX_MW_RATIO)
+                )
+            # the only place where similarity to the input is used: ordering what was already picked
+            ref_fp = AllChem.GetMorganFingerprintAsBitVect(input_mol, 2, nBits=2048)
+            scored = [
+                (
+                    DataStructs.TanimotoSimilarity(
+                        ref_fp,
+                        AllChem.GetMorganFingerprintAsBitVect(Chem.MolFromSmiles(smi), 2, nBits=2048),
+                    ),
+                    smi,
+                )
+                for smi in selected
+            ]
+            scored.sort(key=lambda item: -item[0])
+            return [smi for _, smi in scored]
         finally:
             shutil.rmtree(self.tmp_folder, ignore_errors=True)

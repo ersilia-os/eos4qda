@@ -1,6 +1,6 @@
 # FasmiFra molecule generator
 
-Assembles new molecules by recombining fragments cut from a reference set, using DeepSMILES to keep the resulting strings syntactically valid. Berenger and Tsuda designed FASMIFRA for speed, showing that straightforward fragment assembly can generate large libraries far faster than neural generators while preserving the distribution of properties found in the source molecules. Output resembles the input collection by construction, which limits novelty but keeps candidates within familiar chemistry.
+Assembles analogues of the input by cutting it into fragments, mixing those into a 100,000-molecule ChEMBL fragment library at heavy weight, and recombining them with FASMIFRA, the DeepSMILES-based assembler of Berenger and Tsuda that emits only syntactically valid strings at over 340,000 molecules per second. Ersilia then keeps only candidates that retain a piece of the input and weigh at most 1.5 times as much, never the input itself, and orders them by Morgan Tanimoto similarity.
 
 This model was incorporated on 2023-08-01.Last packaged on 2026-09-28.
 
@@ -23,7 +23,7 @@ This model was incorporated on 2023-08-01.Last packaged on 2026-09-28.
 ### Output
 - **Output Dimension:** `100`
 - **Output Consistency:** `Variable`
-- **Interpretation:** Up to 100 generated molecules assembled by recombining fragments from a reference set.
+- **Interpretation:** Up to 100 analogues containing a fragment of the input, ordered from most to least Tanimoto-similar.
 
 Below are the **Output Columns** of the model:
 | Name | Type | Direction | Description |

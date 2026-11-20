@@ -2,7 +2,8 @@
 
 Assembles analogues of the input by cutting it into fragments, mixing those into a 100,000-molecule ChEMBL fragment library at heavy weight, and recombining them with FASMIFRA, the DeepSMILES-based assembler of Berenger and Tsuda that emits only syntactically valid strings at over 340,000 molecules per second. Ersilia then keeps only candidates that retain a piece of the input and weigh at most 1.5 times as much, never the input itself, and orders them by Morgan Tanimoto similarity.
 
-This model was incorporated on 2023-08-01.Last packaged on 2026-09-28.
+This model was incorporated on 2023-08-01.
+Last packaged on 2026-09-28.
 
 ## Information
 ### Identifiers

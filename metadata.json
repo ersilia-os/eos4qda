@@ -45,6 +45,7 @@
         "AMD64",
         "ARM64"
     ],
+    "Apptainer": "https://models-sif.s3.eu-north-1.amazonaws.com/eos4qda_v3.sif",
     "Model Size": 28.0,
     "Environment Size": 464.0,
     "Image Size": 194.7,

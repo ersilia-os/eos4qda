@@ -37,7 +37,7 @@
     "License": "GPL-3.0-only",
     "Contributor": "miquelduranfrigola",
     "Incorporation Date": "2023-08-01",
-    "Last Packaging Date": "2026-09-28",
+    "Last Packaging Date": "2026-11-23",
     "Release": "v2.0.0",
     "S3": "https://ersilia-models-zipped.s3.eu-central-1.amazonaws.com/eos4qda.zip",
     "DockerHub": "https://hub.docker.com/r/ersiliaos/eos4qda",
@@ -47,10 +47,10 @@
     ],
     "Model Size": 28.0,
     "Environment Size": 464.0,
-    "Image Size": 587.52,
-    "Computational Performance 1": 118.87,
-    "Computational Performance 2": 1014.43,
-    "Computational Performance 3": -1.0,
+    "Image Size": 194.7,
+    "Computational Performance 1": 23.79,
+    "Computational Performance 2": 44.34,
+    "Computational Performance 3": 345.95,
     "Computational Performance 4": -1.0,
     "Computational Performance 5": -1.0
 }
